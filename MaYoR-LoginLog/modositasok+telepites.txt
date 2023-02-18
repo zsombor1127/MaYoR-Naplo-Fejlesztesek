@@ -1,0 +1,39 @@
+www/policy/private/naplo/admin/
+	loginLog.php
+	loginLog-pre.php
+	
+www/skin/classic/module-naplo/
+	html/admin/loginLog.phtml
+	css/admin/loginLog.css
+	javascript/admin/loginLog.jquery.min.js
+	
+www/include/modules/naplo/admin/
+	loginLog.php
+	
+	
+www/include/modules/naplo/share/
+	diak.php -> kapott egy új függvényt ami id alapján visszaadja a felhasználónevet getDiakFelhasznaloById()
+	tanar.php -> kapott egy új függvényt ami id alapján visszaadja a felhasználónevet getTanarFelhasznaloById()
+	szulo.php -> fog kapni egy új függvényt ami id alapján visszaadja a felhasználónevet
+	
+Telepítés:
+	
+Másoljuk a frontend/loginLog.phtml fájlt a var/mayor/www/skin/classic/module-naplo/html/admin/ mappába
+
+Másoljuk a frontend/loginLog.css fájlt a var/mayor/www/skin/classic/module-naplo/css/admin/ mappába
+
+Másoljuk a frontend/loginLog.jquery.min.js fájlt a var/mayor/www/skin/classic/module-naplo/javascript/admin/ mappába
+
+Másoljuk a backend/private/loginLog.php és loginLog-pre.php fájlokat a var/mayor/www/policy/private/naplo/admin/ mappába
+
+Másoljuk a backend/module/loginLog.php fájlt a var/mayor/www/include/modules/naplo/admin/ mappába
+
+Másoljuk a backend/users/users.php fájlban található függvényeket a var/mayor/www/include/modules/naplo/share/diak.php illetve tanar.php fájlokba (a users.php fájlba le van írva melyik függvény hova megy)
+
+Adjuk hozzá a var/mayor/www/include/menu/private/hu_HU/module-naplo.php fájlhoz az alábbi sort:
+'loginLog' => array(array('txt' => 'Naplózott bejelentkezések', 'url' => 'index.php?page=naplo&sub=admin&f=loginLog', 'icon'=>'icon-address-book')),
+
+ezt a $MENU['modules']['naplo']['sub']['admin'] tömbben található 'kréta magic' sor alá kell bemásolni,
+ez valahol az 550. sor környékén lesz
+
+Ha mindent jól csináltunk akkor az 'Admin' menüben meg kell jelennie egy 'Naplózott bejelentkezések' menüpontnak

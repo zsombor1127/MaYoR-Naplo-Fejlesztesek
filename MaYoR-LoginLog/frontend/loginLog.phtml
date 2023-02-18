@@ -1,0 +1,235 @@
+<?php
+    //Összeállítja a keresőfelületet
+    function putLogHeader($date, $flags, $users = array('students' => null, 'teachers' => null, 'parents' => null)) {
+        global $POLICIES;
+
+        formBegin(array(
+            'action'=>location('index.php?page=naplo&sub=admin&f=loginLog'),
+            'class'=>'loginLog',
+        ));
+            echo '<input type="hidden" name="action" value="search" />';
+            echo '<table class="loginLog-header" align="center" cellspacing="1">';
+
+                echo '<thead>';
+                    echo '<tr>'."\n";
+                        echo '<th colspan="5">Naplózott bejelentkezések</th>'."\n";
+                    echo '</tr>'."\n";
+                echo '</thead>';
+                echo '<tfoot><tr><td colspan="5"></td></tr></tfoot>';
+
+                echo '<tbody>'."\n";
+                    echo '<tr>'."\n";
+
+                        //Policy választó
+                        echo '<th style="width: 100px;">'."\n";
+                            echo '<label for="toPolicy">Policy</label><br>';
+                            echo '<select id="toPolicy" name="toPolicy">'."\n";
+                                $SELECTED = array($toPolicy => ' selected="selected" ');
+                                echo '<option value="-" selected=selected> - </option>'."\n";
+
+                                foreach($POLICIES as $policy) {
+                                    echo '<option value="'.$policy.'"'.$SELECTED[$policy].'>'.$policy.'</option>'."\n";
+                                }
+                                echo '</select>'."\n";
+                        echo '</th>'."\n";
+
+                        //Felhasználó kiválasztása
+                        echo '<th style="width: 100px;">'."\n";
+                            echo '<label for="user">Felhasználó</label><br>';
+                            echo '<select name="account" type="text" id="user" list="users">'."\n";
+                                $SELECTED = array($toPolicy => ' selected="selected" ');
+                                echo '<option value="-" selected=selected> - </option>'."\n";
+                                echo '<option value="mayoradmin">mayoradmin</option>'."\n";
+
+                                //Kilistázza a diákokat
+                                echo '<optgroup label="Diákok">'."\n";
+                                    foreach($users['students'] as $student) {
+                                        echo '<option value="diak:'.$student['diakId'].'"'.$SELECTED[$student['diakNev']].'>'.$student['diakNev'].' ('.$student['diakId'].')</option>'."\n";
+                                    }
+                                echo '<optgroup>'."\n";
+                                
+                                //Kilistázza a tanárokat
+                                echo '<optgroup label="Tanárok">'."\n";
+                                    foreach($users['teachers'] as $teacher) {
+                                        echo '<option value="tanar:'.$teacher['tanarId'].'"'.$SELECTED[$teacher['tanarNev']].'>'.$teacher['tanarNev'].' ('.$teacher['tanarId'].')</option>'."\n";
+                                    }
+                                echo '<optgroup>'."\n";
+                                
+                                //Kilistázza a szülőket
+                                echo '<optgroup label="Szülők">'."\n";
+                                    foreach($users['parents'] as $id => $parent) {
+                                        if(is_numeric($id)) echo '<option value="szulo:'.$parent['szuloId'].'"'.$SELECTED[$parent['szuloNev']].'>'.$parent['szuloNev'].' ('.$parent['szuloId'].')</option>'."\n";
+                                    }
+                                echo '<optgroup>'."\n";
+                            echo '</select>'."\n";
+                        echo '</th>'."\n";
+
+                        //Dátum beállítása
+                        echo '<th style="width: 250px;">'."\n";
+                            echo '<label for="date">Dátum</label><br>';
+
+                            echo '<input name="tolDt" type="text" id="date" list="dates" style="width: 90px;"> - '."\n";
+                            echo '<input name="igDt" type="text" id="date" list="dates" style="width: 90px;">'."\n";
+                            echo '<datalist id="dates" name="tolDt">'."\n";
+                                echo '<option value=""> - </option>'."\n";
+                                foreach($date as $day) {
+                                    echo '<option value="'.$day.'"'.$day.'>'.$day.'</option>'."\n";
+                                }
+                            echo '</datalist>'."\n";
+                        echo '</th>'."\n";
+
+                        //Hibakód kiválasztása
+                        echo '<th style="width:100px">'."\n";
+                            echo '<label for="flag">Hibakód</label><br>'."\n";
+                            echo '<select id="flag" name="flag">'."\n";
+                                echo '<option value="-" selected=selected> - </option>'."\n";
+                                foreach($flags as $id => $flag) {
+                                    echo '<option value="'.$id.'">'.$flag.' ('.$id.')</option>'."\n";
+                                }
+                            echo '</select>'."\n";
+                        echo '</th>'."\n";
+
+                        
+                        //Submit gomb
+                        echo '<th style="width: 100px;">'."\n";
+                            echo '<label for="search">Keresés</label><br>';
+                            echo '<input id="search" type="submit" value="OK" />'."\n";
+                        echo '</th>'."\n";
+
+                    echo '</tr>'."\n";
+                echo '</tbody>'."\n";
+            echo '</table>'."\n";
+        formEnd();
+    }
+
+    //Összeállítja a statisztikákat tartalmazó táblázatot
+    function putLoginStat($login_stat) {
+        echo '<table class="loginLog-stat" align="center" cellspacing="1">'."\n";
+            echo '<thead>';
+                echo '<tr>'."\n";
+                    echo '<th style="width: 120px;"><p>Bejelentkezés</p></th>'."\n";
+                    echo '<th style="width: 120px;"><p>Hibás felhasználónév</p></th>'."\n";
+                    echo '<th style="width: 120px;"><p>Hibás jelszó</p></th>'."\n";
+                 echo '</tr>'."\n";
+            echo '</thead>';
+            echo '<tfoot><tr><td colspan="3"></td></tr></tfoot>';
+
+            echo '<tbody>'."\n";
+                echo '<tr>'."\n";
+                    echo '<th><p>'.$login_stat['logins'].' db</p></th>'."\n";
+                    echo '<th><p>'.$login_stat['bad_uid'].' db</p></th>'."\n";
+                    echo '<th><p>'.$login_stat['bad_pwd'].' db</p></th>'."\n";
+                echo '</tr>'."\n";
+            echo '</tbody>'."\n";
+        echo '</table>'."\n";
+    }
+
+    //Összeállítja az oldalváltó formot
+    function putSwitchPageForm($previous_search = array(), $page_data = array()) {
+        $toPolicy = $previous_search['toPolicy'];
+        $userAccount = $previous_search['account'];
+        $tolDt = $previous_search['tolDt'];
+        $igDt = $previous_search['igDt'];
+        $flag = $previous_search['flag'];
+
+        if(is_null($toPolicy)) $toPolicy = '-';
+        if(is_null($userAccount)) $userAccount = '-';
+        if(is_null($tolDt)) $tolDt = '-';
+        if(is_null($igDt)) $igDt = '-';
+        if(is_null($flag)) $flag = '-';
+
+        formBegin(array(
+            'action'=>location('index.php?page=naplo&sub=admin&f=loginLog'),
+            'class'=>'switchpage',
+            'id'=>'switchpage',
+        ));
+
+        echo '<input name="action" type="hidden" value="switchpage">'."\n";
+
+        //Tartalmazzák az előző keresés adatait
+        echo '<input name="toPolicy" type="hidden" value="'.$toPolicy.'">'."\n";
+        echo '<input name="account" type="hidden" value="'.$userAccount.'">'."\n";
+        echo '<input name="tolDt" type="hidden" value="'.$tolDt.'">'."\n";
+        echo '<input name="igDt" type="hidden" value="'.$igDt.'">'."\n";
+        echo '<input name="flag" type="hidden" value="'.$flag.'">'."\n";
+
+        echo '<table class="switchpage" align="center" cellspacing="1">'."\n";
+            echo '<thead>'."\n";
+                echo '<tr>'."\n";
+                    echo '<th style="width: 50px" class="arrow" id="back">'."\n";
+                        echo '<p> < </p>'."\n";
+                    echo '</th>'."\n"; 
+
+                    echo '<th style="width: 160px">'."\n";
+                        echo '<p>Kiválasztott oldal: '."\n";
+                            echo '<select name="current" type="text" onchange="this.form.submit()">'."\n";
+                                for($i=0; $i<$page_data['chunks']; $i++) {
+                                    $page = $i + 1;
+                                    if($page != $page_data['current_page']) echo '<option value="'.$page.'">'.$page.'</option>'."\n";
+                                    if($page == $page_data['current_page']) echo '<option value="'.$page.'" selected=selected>'.$page.'</option>'."\n";
+                                }
+                            echo '</select>'."\n";
+                        echo '</p>'."\n";
+                    echo '</th>'."\n";
+
+                    echo '<th style="width: 50px" class="arrow" id="forward">'."\n";
+                        echo '<p> > </p>'."\n";
+                    echo '</th>'."\n"; 
+                echo '</tr>'."\n";
+            echo '</thead>'."\n";
+        echo '</table>'."\n";
+                
+        formEnd();
+    }
+
+    //Összeállítja a keresési eredményeket tartalmazó táblázatot
+    function putSearchResults($logins) {
+        echo '<table class="searchresult" align="center" cellspacing="1">'."\n";
+            echo '<thead>';
+                echo '<tr>'."\n";
+                    echo '<th style="width: 120px;"><p>Azonosító</p></th>'."\n";
+                    echo '<th style="width: 120px;"><p>Policy</p></th>'."\n";
+                    echo '<th style="width: 120px;"><p>Fiók</p></th>'."\n";
+                    echo '<th style="width: 120px;"><p>Ip cím</p></th>'."\n";
+                    echo '<th style="width: 120px;"><p>Dátum</p></th>'."\n";
+                    echo '<th style="width: 185px;"><p>Hibakód</p></th>'."\n";
+                echo '</tr>'."\n";
+            echo '</thead>';
+
+            if(count($logins) != 0) {
+                echo '<tfoot><tr><td colspan="6"></td></tr></tfoot>';
+                echo '<tbody>'."\n";
+                    $count = 0;
+                    foreach($logins as $login) {
+                        if ($count % 2 ==1) $class = 'paratlan';
+                        else $class = 'paros';
+
+                        if($login['userAccount'] == 'mayoradmin' && $login['flag'] == 23) $class = 'alert';
+
+                        if($login['flag'] == 0) $login['flag'] = '<b style="color: green;">Sikeres bejelentkezés ('.$login['flag'].')</b>';
+                        if($login['flag'] == 1) $login['flag'] = '<b style="color: #eed202;">A jelszó lejárt ('.$login['flag'].')</b>';
+                        if($login['flag'] == 2) $login['flag'] = '<b style="color: red;">Ismeretlen hiba ('.$login['flag'].')</b>';
+                        if($login['flag'] == 3) $login['flag'] = '<b style="color: #eed202;">2fa szükséges ('.$login['flag'].')</b>';
+                        if($login['flag'] == 21) $login['flag'] = '<b style="color: #eed202;">Hibás felhasználónév ('.$login['flag'].')</b>';
+                        if($login['flag'] == 22) $login['flag'] = '<b style="color: #eed202;">Multi uid('.$login['flag'].')</b>';
+                        if($login['flag'] == 23) $login['flag'] = '<b style="color: red;">Hibás jelszó ('.$login['flag'].')</b>';
+                        if($login['flag'] == 24) $login['flag'] = '<b style="color: red;">Felhasználó letiltva ('.$login['flag'].')</b>';
+                        if($login['flag'] == 25) $login['flag'] = '<b style="color: #eed202;">Bejelentkezés korlátozott ('.$login['flag'].')</b>';
+
+                        echo '<tr class="'.$class.'">'."\n";
+                            echo '<td>'.$login['logId'].'</td>'."\n";
+                            echo '<td>'.$login['policy'].'</td>'."\n";
+                            echo '<td>'.htmlspecialchars($login['userAccount']).'</td>'."\n";
+                            echo '<td>'.htmlspecialchars($login['ip']).'</td>'."\n";
+                            echo '<td>'.$login['dt'].'</td>'."\n";
+                            echo '<td>'.$login['flag'].'</td>'."\n";
+                        echo '</tr>'."\n";
+                        $count++;
+                    }
+                echo '</tbody>'."\n";
+            } else {
+                echo '<tfoot><tr><th colspan="6">A megadott feltételekkel nem található bejelentkezés</th></tr></tfoot>';
+            }
+        echo '</table>'."\n";
+    }
+?>

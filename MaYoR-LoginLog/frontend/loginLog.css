@@ -1,0 +1,26 @@
+:root {
+    --alert_bg: rgb(233, 141, 141);
+    --warning_bg: rgb(253, 241, 105);
+    --success_bg: rgb(124, 232, 85);
+}
+
+table.loginLog-header, table.loginLog-stat { background-color: #aaaaaa; margin-bottom:20px; }
+table.loginLog-header thead th, table.loginLog-stat thead th { background-color: #ccccee; height:2em; border-bottom: solid 2px purple; }
+table.loginLog-header th, table.loginLog-stat th { background-color: white; }
+table.loginLog-header td, table.loginLog-stat td{ background-color: white; }
+table.loginLog-header tfoot td, table.loginLog-stat tfoot td{ background-color: purple; }
+
+table.searchresult .paros { background-color: #eeeeee; }
+table.searchresult .paratlan {	background-color: #dddddd; }
+table.searchresult .alert {background-color: var(--alert_bg);}
+table.searchresult .warning {background-color: var(--warning_bg);} 
+table.searchresult .success {background-color: var(--success_bg);}
+
+table.switchpage { margin-right: 16em; margin-bottom: 1em; font-weight: bold;}
+table.switchpage th.arrow { background-color: lightblue; cursor: pointer; border: 1px solid black;}
+
+table.searchresult { background-color: #aaaaaa; margin-bottom:20px; }
+table.searchresult thead th { background-color: #d6bddb; height:2em; border-bottom: solid 2px purple;}
+table.searchresult tbody td {height: 3em;}
+table.searchresult tfoot th { background-color: purple}
+table.searchresult th { background-color: #ffffff; }
